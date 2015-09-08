@@ -1,74 +1,56 @@
-/**
- * Pimcore
- *
- * LICENSE
- *
- * This source file is subject to the new BSD license that is bundled
- * with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * http://www.pimcore.org/license
- *
- * @copyright  Copyright (c) 2009-2010 elements.at New Media Solutions GmbH (http://www.elements.at)
- * @license    http://www.pimcore.org/license     New BSD License
- */
-
 pimcore.registerNS("pimcore.object.classes.data.Tagfield");
+
 pimcore.object.classes.data.Tagfield = Class.create(pimcore.object.classes.data.data, {
+  type: "Tagfield",
 
-    type: "Tagfield",
-    
-    allowIn: {
-        object: true,
-        objectbrick: true,
-        fieldcollection: true,
-        localizedfield: true
-    },
+  allowIn: {
+    object: true,
+    objectbrick: true,
+    fieldcollection: true,
+    localizedfield: true
+  },
 
+  initialize: function (treeNode, initData) {
+    this.type = "Tagfield";
 
-    initialize: function (treeNode, initData) {
-        this.type = "Tagfield";
+    this.initData(initData);
 
-        this.initData(initData);
+    this.treeNode = treeNode;
+  },
 
-        this.treeNode = treeNode;
-    },
+  getTypeName: function () {
+    return t("Tagfield");
+  },
 
-    getTypeName: function () {
-        return t("Tagfield");
-    },
+  getGroup: function () {
+    return "select";
+  },
 
-    getGroup: function () {
-        return "select";
-    },
+  getIconClass: function () {
+    return "pimcore_icon_Tagfield";
+  },
 
-    getIconClass: function () {
-        return "pimcore_icon_Tagfield";
-    },
+  getLayout: function ($super) {
+    $super();
 
-    getLayout: function ($super) {
+    this.specificPanel.removeAll();
 
+    this.specificPanel.removeAll();
 
-        $super();
+    this.specificPanel.add([
+      {
+        xtype: "spinnerfield",
+        fieldLabel: t("width"),
+        name: "width",
+        value: this.datax.width
+      }, {
+        xtype: "textfield",
+        name: "tagskey",
+        fieldLabel: t("Tags key"),
+        value: this.datax.tagskey
+      }
+    ]);
 
-        this.specificPanel.removeAll();
-
-        this.specificPanel.removeAll();
-        this.specificPanel.add([
-            {
-                xtype: "spinnerfield",
-                fieldLabel: t("width"),
-                name: "width",
-                value: this.datax.width
-            },{
-                xtype: "textfield",
-                name: "tagskey",
-                fieldLabel: t("Tags key"),
-                value:this.datax.tagskey
-            }
-
-        ]);
-
-        return this.layout;
-
-    }
+    return this.layout;
+  }
 });

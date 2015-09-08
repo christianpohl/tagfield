@@ -1,79 +1,104 @@
 <?php
 
-class Tagfield_Plugin extends Pimcore_API_Plugin_Abstract implements Pimcore_API_Plugin_Interface {
+namespace Tagfield;
 
+use Pimcore\API\Plugin as PluginLib;
+
+/**
+ * Class Plugin
+ * @package Tagfield
+ */
+class Plugin extends PluginLib\AbstractPlugin implements PluginLib\PluginInterface
+{
     /**
-     *  install function
-     * @return string $message statusmessage to display in frontend
+     * @return string
      */
-    public static function install() {
-        Pimcore_API_Plugin_Abstract::getDb()->query("CREATE TABLE IF NOT EXISTS `plugin_tagfield` (
-		`id` INT NOT NULL AUTO_INCREMENT,
-                `key` varchar(255) DEFAULT NULL ,
-		`tag` varchar(255) DEFAULT NULL ,
-			  PRIMARY KEY  (`id`)
-			) ENGINE=MyISAM DEFAULT CHARSET=utf8;");
+    public static function install()
+    {
+        try {
+            PluginLib\AbstractPlugin::getDb()->query(
+                'CREATE TABLE IF NOT EXISTS plugin_tagfield (
+                id INT NOT NULL AUTO_INCREMENT,
+                key varchar(255) DEFAULT NULL,
+                tag varchar(255) DEFAULT NULL,
+  PRIMARY KEY (id)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8;'
+            );
+        } catch (\Exception $e) {
+            $message = 'Error querying plugin query: ' . $e->getMessage() . $e->getCode();
+
+            \Logger::error('Tagfield-Plugin: ' . $message);
+        }
+
+        $statusMessage = 'Tagfield Plugin could not be installed';
 
         if (self::isInstalled()) {
-            $statusMessage = "Tagfield Plugin successfully installed.";
-        } else {
-            $statusMessage = "Tagfield Plugin could not be installed";
+            $statusMessage = 'Tagfield Plugin successfully installed.';
         }
+
         return $statusMessage;
     }
 
     /**
-     *
-     * @return boolean
+     * @return bool
      */
-    public static function needsReloadAfterInstall() {
+    public static function needsReloadAfterInstall()
+    {
         return true;
     }
 
-    public static function uninstall() {
-        Pimcore_API_Plugin_Abstract::getDb()->query("DROP TABLE `plugin_tagfield`");
+    /**
+     * @return string
+     */
+    public static function uninstall()
+    {
+        PluginLib\AbstractPlugin::getDb()->query('DROP TABLE plugin_tagfield');
 
-
-
-
-
+        $statusMessage = 'Tagfield Plugin could not be uninstalled';
 
         if (!self::isInstalled()) {
-            $statusMessage = "Tagfield Plugin successfully uninstalled.";
-        } else {
-            $statusMessage = "Tagfield Plugin could not be uninstalled";
+            $statusMessage = 'Tagfield Plugin successfully uninstalled.';
         }
+
         return $statusMessage;
     }
 
-    public static function isInstalled() {
+    /**
+     * @return bool
+     */
+    public static function isInstalled()
+    {
         $result = null;
+
         try {
-            $result = Pimcore_API_Plugin_Abstract::getDb()->query("SELECT * FROM `plugin_tagfield`") or die ("La table n'existe pas");
-        } catch (Zend_Db_Statement_Exception $e) {
-            
+            $result = PluginLib\AbstractPlugin::getDb()->query('SELECT * FROM plugin_tagfield');
+        } catch (\Exception $e) {
+            $message = 'Error querying plugin query: ' . $e->getMessage() . $e->getCode();
+
+            \Logger::error('Tagfield-Plugin: ' . $message);
         }
-        return!empty($result);
+
+        return $result ? true : false;
     }
 
     /**
-     * @return string $jsClassName
+     * @return string
      */
-    public static function getJsClassName() {
-        return ""; //pimcore.plugin.customerDb";
+    public static function getJsClassName()
+    {
+        return '';
     }
 
     /**
-     *
      * @param string $language
-     * @return string path to the translation file relative to plugin direcory
+     * @return string
      */
-    public static function getTranslationFile($language) {
-        if(file_exists(PIMCORE_PLUGINS_PATH . "/Tagfield/texts/" . $language . ".csv")){
-            return "/Tagfield/texts/" . $language . ".csv";
+    public static function getTranslationFile($language)
+    {
+        if (file_exists(PIMCORE_PLUGINS_PATH . '/Tagfield/texts/' . $language . '.csv')) {
+            return '/Tagfield/texts/' . $language . '.csv';
         }
-        return "/Tagfield/texts/en.csv";
-        
-    }
 
+        return '/Tagfield/texts/en.csv';
+    }
 }

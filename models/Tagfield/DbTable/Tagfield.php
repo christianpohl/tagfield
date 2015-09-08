@@ -1,11 +1,20 @@
 <?php
 
-class Tagfield_DbTable_Tagfield extends Zend_Db_Table_Abstract {
+namespace Tagfield\DbTable;
 
-    protected $_name = "plugin_tagfield";
-    protected $_primary = "id";
+/**
+ * Class Tagfield
+ * @package Tagfield\DbTable
+ */
+class Tagfield extends \Zend_Db_Table_Abstract
+{
+    /**
+     * @var string
+     */
+    protected $_name = 'plugin_tagfield';
 
-
+    /**
+     * @var string
+     */
+    protected $_primary = 'id';
 }
-
-?>

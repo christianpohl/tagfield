@@ -1,39 +1,39 @@
 <?php
 
-class Tagfield_Tagfield {
+namespace Tagfield;
 
+/**
+ * Class Tagfield
+ * @package Tagfield
+ */
+class Tagfield
+{
     /**
-     *
-     * @var Tagfield_DbTable_Tagfield 
+     * @var Tagfield_DbTable_Tagfield
      */
     private $table;
 
-    public function __construct() {
-        $pimDb = Pimcore_Resource_Mysql::get();
-        $rev = Pimcore_Version::$revision;
-        if ($rev > 1350) {
-            Zend_Db_Table::setDefaultAdapter($pimDb->getResource());
-        } else {
-            Zend_Db_Table::setDefaultAdapter($pimDb);
-        }
+    /**
+     * constructor
+     */
+    public function __construct()
+    {
+        \Zend_Db_Table::setDefaultAdapter(
+            \Pimcore\Resource\Mysql::get()->getResource()
+        );
 
-
-
-        $this->table = new Tagfield_DbTable_Tagfield();
+        $this->table = new \Tagfield\DbTable\Tagfield();
     }
 
     /**
-     *
-     * @param string $key
-     * @return array
+     * @param $key
+     * @return mixed
      */
-    public function getTagsByKey($key) {
+    public function getTagsByKey($key)
+    {
+        $select = $this->table->select()->where('`key` LIKE ?', $key);
 
-        $select = $this->table->select();
-        $select->where('`key` LIKE "' . $key . '"');
         $tags = $this->table->fetchAll($select);
-
-
 
         return $tags->toArray();
     }
@@ -43,16 +43,17 @@ class Tagfield_Tagfield {
      * @param string $key
      * @return array
      */
-    public function getTagListByKey($key) {
-        $select = $this->table->select();
-        $select->where('`key` LIKE "' . $key . '"');
+    public function getTagListByKey($key)
+    {
+        $select = $this->table->select()->where('`key` LIKE ?', $key);
+
         $tags = $this->table->fetchAll($select);
-        $list = array();
+
+        $list = [];
+
         foreach ($tags as $tag) {
-            array_push($list, $tag->tag);
+            $list[] = $tag->tag;
         }
-
-
 
         return $list;
     }
@@ -60,17 +61,20 @@ class Tagfield_Tagfield {
     /**
      *
      * @param string $key
-     * @param array $tags 
+     * @param array $tags
      */
-    public function setTags($key, $tags) {
+    public function setTags($key, $tags)
+    {
         $exTags = $this->getTagListByKey($key);
+
         if (is_array($tags)) {
             foreach ($tags as $tag) {
-                if (!in_array($tag, $exTags)) {
+                if (!in_array($tag, $exTags, true)) {
                     $this->addTag($key, $tag);
                 }
             }
         }
+
         return true;
     }
 
@@ -80,17 +84,17 @@ class Tagfield_Tagfield {
      * @param string $tag
      * @return boolean
      */
-    private function addTag($key, $tag) {
-        $key = addslashes($key);
-        $tag = addslashes($tag);
+    private function addTag($key, $tag)
+    {
+        if ($tag !== '') {
+            $this->table->insert([
+                'key' => addslashes($key),
+                'tag' => addslashes($tag),
+            ]);
 
-        if ($tag != "") {
-            $ret = $this->table->insert(array("key" => $key, "tag" => $tag));
             return true;
         }
+
         return false;
     }
-
 }
-
-?>
